@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://c4xvhwa6bnnmk"]
+
+[ext_resource type="PackedScene" uid="uid://bymky5h6gnut7" path="res://Player Conrollers/PREMADE2dPlayer.tscn" id="1_1i4fp"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+scale = Vector2(2.16693, 2.16693)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+polygon = PackedVector2Array(-4, 1, 50, 14, 150, 21, 269, -14, 375, -19, 498, -16, 644, -16, 678, -158, 681, -235, 575, -298, 497, -326, 333, -364, 197, -386, 22, -367, -55, -311, -41, -197, -41, -96, -14, -10, -49, -4, -108, -385, 691, -437, 729, -83, 473, 104, -57, 64, -60, 21)
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D"]
+polygon = PackedVector2Array(-4, 1, 50, 14, 150, 21, 269, -14, 375, -19, 494.71, -16.1519, 650.691, -59.5313, 678, -158, 681, -235, 575, -298, 497, -326, 333, -364, 197, -386, 22, -367, -55, -311, -41, -197, -41, -96, -14, -10, -49, -4, -108, -385, 691, -437, 729, -83, 655, 5, 473, 104, -57, 64, -60, 21)
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+scale = Vector2(1.73512, 1.73512)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D2"]
+polygon = PackedVector2Array(285, -212, 227, -198, 218, -146, 357, -154, 382, -219)
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D2"]
+polygon = PackedVector2Array(285, -212, 227, -198, 218, -146, 357, -154, 382, -219)
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+position = Vector2(499, 107)
+scale = Vector2(1.73512, 1.73512)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D3"]
+polygon = PackedVector2Array(285, -212, 227, -198, 218, -146, 357, -154, 382, -219)
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D3"]
+polygon = PackedVector2Array(285, -212, 227, -198, 218, -146, 357, -154, 382, -219)
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="."]
+position = Vector2(-417, -76)
+scale = Vector2(1.73512, 1.73512)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D4"]
+polygon = PackedVector2Array(285, -212, 227, -198, 218, -146, 357, -154, 382, -219)
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D4"]
+polygon = PackedVector2Array(285, -212, 227, -198, 218, -146, 357, -154, 382, -219)
+
+[node name="Player" parent="." instance=ExtResource("1_1i4fp")]
+position = Vector2(99, -95)

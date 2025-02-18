@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://cs3r1t3bqjd7g"]
+
+[ext_resource type="Script" path="res://assets/2dPlayer.gd" id="1_q464i"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgoco"]
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+script = ExtResource("1_q464i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_lgoco")
+
+[node name="Polygon2D" type="Polygon2D" parent="CollisionShape2D"]
+polygon = PackedVector2Array(0, 15, 8, 11, 10, 6, 10, -8, 6, -14, 0, -15, -7, -13, -10, -8, -10, 7, -7, 12)
+
+[node name="Camera2D" type="Camera2D" parent="."]
