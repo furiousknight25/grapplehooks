@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bcx63mqj80yes"]
+[gd_scene load_steps=6 format=3 uid="uid://bcx63mqj80yes"]
 
 [ext_resource type="Script" path="res://Player Conrollers/first_person_controller.gd" id="1_sjy6i"]
 
@@ -6,8 +6,15 @@
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_g1ecg"]
 
+[sub_resource type="TorusMesh" id="TorusMesh_git6v"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4s81k"]
+albedo_color = Color(0, 0, 0, 1)
+emission_enabled = true
+emission = Color(0.674802, 0, 0.127615, 1)
+emission_energy_multiplier = 4.78
+
 [node name="CharacterBody3D" type="CharacterBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.87224, 0)
 script = ExtResource("1_sjy6i")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -19,3 +26,21 @@ mesh = SubResource("CapsuleMesh_g1ecg")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.64104, 0)
+
+[node name="LookRayCast" type="RayCast3D" parent="Camera3D"]
+target_position = Vector3(0, 0, -20)
+debug_shape_thickness = 1
+
+[node name="DebugLookCast" type="MeshInstance3D" parent="Camera3D/LookRayCast"]
+transform = Transform3D(0.17354, 0, 0, 0, 0.17354, 0, 0, 0, 0.17354, 0, 0, 0)
+top_level = true
+mesh = SubResource("TorusMesh_git6v")
+surface_material_override/0 = SubResource("StandardMaterial3D_4s81k")
+
+[node name="DebugLookCast2" type="MeshInstance3D" parent="Camera3D/LookRayCast/DebugLookCast"]
+transform = Transform3D(0.803283, 0, 0, 0, -3.51126e-08, -1.18314, 0, 0.803283, -5.17168e-08, 0, 0, 0)
+mesh = SubResource("TorusMesh_git6v")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_4s81k")
+
+[node name="GrappleHook1" type="Node3D" parent="."]
