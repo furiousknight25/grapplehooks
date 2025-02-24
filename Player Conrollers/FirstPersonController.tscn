@@ -1,6 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://bcx63mqj80yes"]
+[gd_scene load_steps=10 format=3 uid="uid://bcx63mqj80yes"]
 
 [ext_resource type="Script" path="res://Player Conrollers/first_person_controller.gd" id="1_sjy6i"]
+
+[sub_resource type="Curve" id="Curve_8vvrl"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.205263, 0.725275), 0.0, 0.0, 0, 0, Vector2(0.521053, 1), 0.0, 0.0, 0, 0, Vector2(0.9, 0.010989), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lwjk5"]
 
@@ -14,8 +18,21 @@ emission_enabled = true
 emission = Color(0.674802, 0, 0.127615, 1)
 emission_energy_multiplier = 4.78
 
+[sub_resource type="SphereMesh" id="SphereMesh_5i0nk"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t1tsn"]
+albedo_color = Color(0.421637, 0, 0.129971, 1)
+
+[sub_resource type="Curve3D" id="Curve3D_3c0v4"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0.00202859, 0.00708499, -0.000848591, 0, 0, 0, 0, 0, 0, 0.0685794, 0.731389, -0.980191, 0, 0, 0, 0, 0, 0, 0.323578, 0.716471, -2.18191, 0, 0, 0, 0, 0, 0, 0.472602, 1.18157, -2.97197, 0, 0, 0, 0, 0, 0, 0.710218, -0.480691, -4.13084, 0, 0, 0, 0, 0, 0, 0.93129, 1.08961, -5.1245, 0, 0, 0, 0, 0, 0, 1.2161, 1.41061, -6.694, 0, 0, 0, 0, 0, 0, 1.57858, 0.703644, -8.15047, 0, 0, 0, 0, 0, 0, 1.6093, 1.43466, -8.94993, 0, 0, 0, 0, 0, 0, 1.82806, 1.03186, -9.63244, 0, 0, 0, 0, 0, 0, 1.89413, 1.65943, -10.5079, 0, 0, 0, 0, 0, 0, 2.06109, 1.34414, -11.0218, 0, 0, 0, 0, 0, 0, 2.21708, 1.37167, -11.7897, 0, 0, 0, 0, 0, 0, 2.34261, 1.53681, -12.5353, 0, 0, 0, 0, 0, 0, 2.5109, 1.59186, -13.3864),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 15
+
 [node name="CharacterBody3D" type="CharacterBody3D"]
 script = ExtResource("1_sjy6i")
+rope_curve = SubResource("Curve_8vvrl")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_lwjk5")
@@ -44,3 +61,67 @@ skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_4s81k")
 
 [node name="GrappleHook1" type="Node3D" parent="."]
+
+[node name="GrappleStart" type="MeshInstance3D" parent="GrappleHook1"]
+transform = Transform3D(0.217537, 0, 0, 0, 0.217537, 0, 0, 0, 0.217537, -0.548543, 0.441206, -0.231051)
+visible = false
+mesh = SubResource("SphereMesh_5i0nk")
+
+[node name="GrappleEnd" type="MeshInstance3D" parent="GrappleHook1"]
+transform = Transform3D(0.228856, 0, 0, 0, 0.228856, 0, 0, 0, 0.228856, -0.628467, 0.441206, -0.787382)
+top_level = true
+mesh = SubResource("SphereMesh_5i0nk")
+surface_material_override/0 = SubResource("StandardMaterial3D_t1tsn")
+
+[node name="Line" type="Path3D" parent="GrappleHook1"]
+top_level = true
+curve = SubResource("Curve3D_3c0v4")
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="GrappleHook1/Line"]
+polygon = PackedVector2Array(-0.000945842, 0.0290405, -0.0199928, 0.0196214, -0.0327328, 0.00141066, -0.0204179, -0.0171559, -0.00195675, -0.0300432, 0.0155773, -0.023012, 0.0297729, -0.000444204, 0.0257519, 0.012036)
+mode = 2
+path_node = NodePath("..")
+path_interval_type = 1
+path_interval = 0.21
+path_simplify_angle = 0.0
+path_rotation = 2
+path_local = false
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+smooth_faces = true
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Velocity" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = -553.0
+offset_top = -306.0
+offset_right = -513.0
+offset_bottom = -283.0
+scale = Vector2(2.87363, 2.87363)
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 2.0
+offset_right = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TimeToStartPulling" type="Timer" parent="."]
+one_shot = true

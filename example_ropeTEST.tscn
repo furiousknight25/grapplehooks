@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://g3igorfb23kk"]
+
+[ext_resource type="Script" path="res://example_rope_test.gd" id="1_c4snp"]
+
+[sub_resource type="Curve3D" id="Curve3D_2641r"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -0.0595598, -0.00581127, 0.00266314, 0, 0, 0, 0, 0, 0, 1.17877, 0.301617, -0.116591, 0, 0, 0, 0, 0, 0, 1.79322, 0.119437, -0.0611687, 0, 0, 0, 0, 0, 0, 2.79294, -0.108287, 0.00548935, 0, 0, 0, 0, 0, 0, 4.10497, -0.187991, 0.0179396, 0, 0, 0, 0, 0, 0, 4.80194, 0.0738923, -0.0795996, 0, 0, 0, 0, 0, 0, 5.70535, -0.142446, -0.0157506, 0, 0, 0, 0, 0, 0, 6.37944, -0.187991, -0.00778079),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_djycy"]
+
+[node name="ExampleRope" type="Node3D"]
+script = ExtResource("1_c4snp")
+
+[node name="Path3D" type="Path3D" parent="."]
+curve = SubResource("Curve3D_2641r")
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="Path3D"]
+polygon = PackedVector2Array(0, 0, 0.0450391, 0.214973, 0.200001, 0.21771, 0.211198, 0.0264727)
+mode = 2
+path_node = NodePath("..")
+path_interval_type = 0
+path_interval = 1.0
+path_simplify_angle = 0.0
+path_rotation = 2
+path_local = false
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.96827, 0, 0)
+mesh = SubResource("BoxMesh_djycy")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.93465, 2.38419e-07, 6.53064)

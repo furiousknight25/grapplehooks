@@ -19,6 +19,10 @@ config/icon="res://icon.png"
 
 Director="*res://director.gd"
 
+[display]
+
+window/stretch/mode="viewport"
+
 [input]
 
 forward={
