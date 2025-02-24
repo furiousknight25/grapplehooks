@@ -42,10 +42,10 @@ func _physics_process(delta: float) -> void:
 				velocity.y += jump_strength
 				jump_buffer = .1
 		STATE.AIR:
-			
+			if is_on_wall(): velocity.lerp(Vector3.ZERO, delta * 5)
 			sv_airaccelerate(movement_dir, delta)
 		STATE.GRAPPLE:
-			
+			sv_airaccelerate(movement_dir, delta)
 			manage_rope(delta)
 	if cur_state != STATE.GRAPPLE:
 		if is_on_floor(): cur_state = STATE.GROUNDED
@@ -55,8 +55,13 @@ func _physics_process(delta: float) -> void:
 	velocity.y -= 9.8 * delta
 	move_and_slide()
 
+
 func sv_airaccelerate(movement_dir, delta):
-	movement_dir = movement_dir * 3
+	var air_strength
+	if cur_state == STATE.GRAPPLE: air_strength = 2
+	else: air_strength = 3
+	
+	movement_dir = movement_dir * air_strength
 	var wish_speed = movement_dir.length()
 	
 	if wish_speed > 1:
@@ -80,48 +85,71 @@ func _input(event: InputEvent) -> void:
 var sin_mag = 1
 var hooked = false
 var retracted = false
+var pause_hook = true
 
+var length_timer = 0.0
+var max_length = 0.0
 func hook_one_manager(delta):
-	if Input.is_action_just_pressed("left_click"):
-		rope_amplitude = .5
-		cur_state = STATE.GRAPPLE
-		#velocity += Vector3(0,2,0)
-		hook_point = look_ray_cast.get_collision_point()
-		var tween = get_tree().create_tween()
-		tween.tween_property(grapple_end, 'global_position', hook_point, .1)
-		generate_rope((global_position-hook_point).length())
-		retracted = false
-		await tween.finished
-		hooked = true
+#region click manager
+	if Input.is_action_just_pressed("left_click") and retracted == true:
+		connect_g()
 	
-	if Input.is_action_just_released("left_click"):
-		cur_state = STATE.AIR
-		hook_point = Vector3.ZERO
-		hook_point = look_ray_cast.get_collision_point()
-		var tween = get_tree().create_tween()
-		tween.tween_property(grapple_end, 'global_position', grapple_start.global_position, .1)
-		hooked = false
-		await tween.finished
-		retracted = true
+	if Input.is_action_just_released("left_click") and retracted == false:
+		release()
+#endregion
 	#Engine.time_scale = .1
-	if hooked:
-		pass
-		#velocity += (hook_point - global_position).normalized() * 30 * delta #v1 grapple
+#region grapple state
+	if Input.is_action_just_pressed('pause'): pause_hook = !pause_hook 
+	if hooked and pause_hook:
+		length_timer -= delta * 6
+		if length_timer <= .2 or (hook_point - global_position).length() < 1:
+			release()
+		#v1 grapple
+		velocity += (hook_point - global_position).normalized() * 40 * delta
+		#velocity +=  delta * Vector3(0,4.8,0)
 	else:
 		if look_ray_cast.is_colliding():
 			look_ray_cast.get_child(0).global_position = look_ray_cast.get_collision_point()
-	
 	if !retracted:
-		
 		grapple_end.show()
 		line.show()
 	else:
 		grapple_end.global_position = grapple_start.global_position
 		grapple_end.hide()
 		line.hide()
+#endregion
 	
 	amplitude_spring(delta)
+
+func connect_g():
+	rope_amplitude = .5
 	
+	
+	#make the if statement based on direction 
+	
+	var match_face_dir = max(0, velocity.normalized().dot((global_position-hook_point).normalized()))
+	velocity -= velocity * Vector3(match_face_dir,match_face_dir,match_face_dir) * .5
+	cur_state = STATE.GRAPPLE
+	velocity += Vector3(0,2,0)
+	hook_point = look_ray_cast.get_collision_point()
+	var tween = get_tree().create_tween()
+	tween.tween_property(grapple_end, 'global_position', hook_point, .1)
+	generate_rope((global_position-hook_point).length())
+	length_timer = (global_position-hook_point).length()
+	max_length = length_timer
+	retracted = false
+	await tween.finished
+	hooked = true
+
+func release():
+	cur_state = STATE.AIR
+	hook_point = Vector3.ZERO
+	hook_point = look_ray_cast.get_collision_point()
+	var tween = get_tree().create_tween()
+	tween.tween_property(grapple_end, 'global_position', grapple_start.global_position, .1)
+	hooked = false
+	await tween.finished
+	retracted = true
 	
 var vel := .01
 var goal := 0.0
@@ -143,18 +171,22 @@ func generate_rope(length):
 		line.curve.add_point(Vector3.ZERO)
 
 @export var rope_curve : Curve
-#@export var noise_rope : 
+@export var noise_rope : NoiseTexture3D
+var noise_progression = randf()
 func manage_rope(delta):
 	#tendon_puller(delta)
 	
 	for i in line.curve.point_count:
+		
 		var ratio = float(i)/float(line.curve.point_count)
 		var line_position = lerp(grapple_start.global_position, grapple_end.global_position, ratio)
 		var offset_y = sin(ratio * .5 * (grapple_end.global_position - grapple_start.global_position).length()) * rope_amplitude * rope_curve.sample(ratio)
+		var offset_noise = noise_rope.noise.get_noise_2d(noise_progression,noise_progression)
+		noise_progression += delta * 25
 		
 		line.curve.set_point_position(i, line.to_local(line_position) + (Vector3(0, offset_y, 0) * transform.basis))
-		
-
+		if i != 0 and i != line.curve.point_count - 1:
+			line.curve.set_point_position(i, line.to_local(line_position) + (Vector3(offset_noise * .1, offset_y, 0) * transform.basis))
 @export var rest_length = 1 #squeze this small to titen
 @export var squeeze_length = .2
 @export var tension_physics = 3

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dn6u2y5kq84v0"]
+[gd_scene load_steps=13 format=3 uid="uid://dn6u2y5kq84v0"]
 
 [ext_resource type="Texture2D" uid="uid://ueodax4gvlqw" path="res://assets/texture_01.png" id="1_i45w8"]
 [ext_resource type="PackedScene" uid="uid://bcx63mqj80yes" path="res://Player Conrollers/FirstPersonController.tscn" id="1_ucsfy"]
@@ -20,6 +20,12 @@ size = Vector3(0.887253, 0.632813, 11.8503)
 
 [sub_resource type="BoxMesh" id="BoxMesh_w85xn"]
 size = Vector3(0.887253, 0.632813, 11.8503)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6nrhr"]
+size = Vector3(0.887253, 8.39111, 21.1576)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vcs3k"]
+size = Vector3(0.887253, 8.39111, 21.1576)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_wcrb1"]
 sky_top_color = Color(0.517281, 0.364497, 0.678797, 1)
@@ -119,6 +125,16 @@ shape = SubResource("BoxShape3D_lpj44")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Enviornment/StaticBody3D4/CollisionShape3D"]
 mesh = SubResource("BoxMesh_w85xn")
+
+[node name="StaticBody3D9" type="StaticBody3D" parent="Enviornment"]
+transform = Transform3D(1, 0, 0, 0, 2.87911, 0, 0, 0, 1.39467, -18.0099, 20.4607, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enviornment/StaticBody3D9"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.87915, 4.65364)
+shape = SubResource("BoxShape3D_6nrhr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Enviornment/StaticBody3D9/CollisionShape3D"]
+mesh = SubResource("BoxMesh_vcs3k")
 
 [node name="Label3D" type="Label3D" parent="Enviornment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35429, -4.64842)

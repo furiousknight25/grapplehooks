@@ -1,10 +1,17 @@
-[gd_scene load_steps=10 format=3 uid="uid://bcx63mqj80yes"]
+[gd_scene load_steps=16 format=3 uid="uid://bcx63mqj80yes"]
 
 [ext_resource type="Script" path="res://Player Conrollers/first_person_controller.gd" id="1_sjy6i"]
 
 [sub_resource type="Curve" id="Curve_8vvrl"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.205263, 0.725275), 0.0, 0.0, 0, 0, Vector2(0.521053, 1), 0.0, 0.0, 0, 0, Vector2(0.9, 0.010989), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 5
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ycvk2"]
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_p50kb"]
+seamless = true
+seamless_blend_skirt = 1.0
+noise = SubResource("FastNoiseLite_ycvk2")
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lwjk5"]
 
@@ -30,9 +37,26 @@ _data = {
 }
 point_count = 15
 
+[sub_resource type="Gradient" id="Gradient_vd0ks"]
+offsets = PackedFloat32Array(0.529851, 0.992537)
+colors = PackedColorArray(0.154876, 0.154876, 0.154876, 1, 0.462291, 0.462291, 0.462291, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_4q6q3"]
+noise_type = 0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_3vs24"]
+color_ramp = SubResource("Gradient_vd0ks")
+noise = SubResource("FastNoiseLite_4q6q3")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w5kel"]
+albedo_texture = SubResource("NoiseTexture2D_3vs24")
+uv1_scale = Vector3(1, 18.425, 1)
+
 [node name="CharacterBody3D" type="CharacterBody3D"]
+collision_layer = 0
 script = ExtResource("1_sjy6i")
 rope_curve = SubResource("Curve_8vvrl")
+noise_rope = SubResource("NoiseTexture3D_p50kb")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_lwjk5")
@@ -43,6 +67,7 @@ mesh = SubResource("CapsuleMesh_g1ecg")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.64104, 0)
+fov = 90.0
 
 [node name="LookRayCast" type="RayCast3D" parent="Camera3D"]
 target_position = Vector3(0, 0, -20)
@@ -63,7 +88,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4s81k")
 [node name="GrappleHook1" type="Node3D" parent="."]
 
 [node name="GrappleStart" type="MeshInstance3D" parent="GrappleHook1"]
-transform = Transform3D(0.217537, 0, 0, 0, 0.217537, 0, 0, 0, 0.217537, -0.548543, 0.441206, -0.231051)
+transform = Transform3D(0.217537, 0, 0, 0, 0.217537, 0, 0, 0, 0.217537, -0.548543, 0.441206, -0.037882)
 visible = false
 mesh = SubResource("SphereMesh_5i0nk")
 
@@ -72,6 +97,9 @@ transform = Transform3D(0.228856, 0, 0, 0, 0.228856, 0, 0, 0, 0.228856, -0.62846
 top_level = true
 mesh = SubResource("SphereMesh_5i0nk")
 surface_material_override/0 = SubResource("StandardMaterial3D_t1tsn")
+
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="GrappleHook1/GrappleEnd"]
+aabb = AABB(-3.27857, -3.89241, -3.02577, 6.55714, 7.78482, 6.05155)
 
 [node name="Line" type="Path3D" parent="GrappleHook1"]
 top_level = true
@@ -90,6 +118,11 @@ path_continuous_u = true
 path_u_distance = 1.0
 path_joined = false
 smooth_faces = true
+material = SubResource("StandardMaterial3D_w5kel")
+
+[node name="Time_To_Disconect" type="Timer" parent="GrappleHook1"]
+wait_time = 0.6
+one_shot = true
 
 [node name="UI" type="Control" parent="."]
 layout_mode = 3
@@ -125,3 +158,5 @@ grow_vertical = 2
 
 [node name="TimeToStartPulling" type="Timer" parent="."]
 one_shot = true
+
+[connection signal="timeout" from="GrappleHook1/Time_To_Disconect" to="." method="release"]
