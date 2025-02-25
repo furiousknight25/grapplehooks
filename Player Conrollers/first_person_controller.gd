@@ -34,6 +34,8 @@ func _ready() -> void:
 	
 	
 func _physics_process(delta: float) -> void:
+	#velocity -= transform.basis.z
+	
 	$UI/Velocity.text = str(snapped((velocity.length()), 0.01))
 	var input = Input.get_vector('left',"right","forward","back")
 	var movement_dir = transform.basis * Vector3(input.x, 0, input.y) * speed #makes sure the forward is the forward you are facing
@@ -133,7 +135,8 @@ func hook_one_manager(delta):
 			release()
 		#v1 grapple
 		velocity += (hook_point - global_position).normalized() * 40 * delta
-		#velocity +=  delta * Vector3(0,4.8,0)
+		
+		velocity +=  delta * Vector3(0,4.8,0)
 	else:
 		if look_ray_cast.is_colliding():
 			look_ray_cast.get_child(0).global_position = look_ray_cast.get_collision_point()
@@ -147,6 +150,7 @@ func hook_one_manager(delta):
 		line_2.hide()
 #endregion
 	
+#region grapple 2
 	if hooked2:
 		if (grapple_end_2.global_position - global_position).length() > centripetal_range: #dot product magic
 			var angle_dif = grapple_end_2.global_position-global_position
@@ -159,6 +163,7 @@ func hook_one_manager(delta):
 			grapple_end_2.freeze = true
 			centripetal_range = (grapple_end_2.global_position - global_position).length()
 			#print(grapple_end_2.freeze)
+#endregion
 		
 #endregion
 	
@@ -173,6 +178,7 @@ func connect_g():
 	velocity -= velocity * Vector3(match_face_dir,match_face_dir,match_face_dir) * .5
 	cur_state = STATE.GRAPPLE
 	velocity += Vector3(0,2,0)
+	
 	hook_point = look_ray_cast.get_collision_point()
 	var tween = get_tree().create_tween()
 	tween.tween_property(grapple_end, 'global_position', hook_point, .1)
@@ -216,8 +222,6 @@ func release_2():
 	retracted = true
 	
 	
-	
-
 var vel := .01
 var goal := 0.0
 var tension := 500.0
@@ -235,18 +239,19 @@ func amplitude_spring(delta):
 @export var noise_rope : NoiseTexture3D
 var noise_progression = randf()
 func manage_rope(delta):
-	
-	
+
 	for i in line.curve.point_count:
 		
 		var ratio = float(i)/float(line.curve.point_count)
 		var line_position = lerp(grapple_start.global_position, grapple_end.global_position, ratio)
 		var offset_y = sin(ratio * .5 * (grapple_end.global_position - grapple_start.global_position).length()) * rope_amplitude * rope_curve.sample(ratio)
+		
 		var offset_noise = noise_rope.noise.get_noise_2d(noise_progression,noise_progression)
 		noise_progression += delta * 25
 		
 		line.curve.set_point_position(i, line.to_local(line_position) + (Vector3(0, offset_y, 0) * transform.basis))
 		if i != 0 and i != line.curve.point_count - 1:
+			
 			line.curve.set_point_position(i, line.to_local(line_position) + (Vector3(offset_noise * .1, offset_y, 0) * transform.basis))
 
 
@@ -265,8 +270,9 @@ func tendon_puller(delta):
 				for e in 1:
 					tendons[i + 1] += distance * delta * tension_physics
 					#var dist_mult = (distance - (Vector3(rest_length, rest_length,rest_length) * distance.normalized())) #somehow gives more weight to the end
-					tendons[i] -= distance * delta * tension_physics
-			
+					tendons[i] -= (distance * delta * tension_physics)
+					#tendons[i] -= Vector3(0,.1,0) * delta
+					
 			tendons[i] *= damping_tendon
 		if i == 0 or i == line_2.curve.point_count - 1:
 			tendons[i] = Vector3.ZERO
