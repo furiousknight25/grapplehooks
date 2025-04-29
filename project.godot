@@ -12,7 +12,7 @@ config_version=5
 
 config/name="GrappleHooks"
 run/main_scene="res://enviornments/3d Enviornment.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.png"
 
 [autoload]
@@ -22,6 +22,14 @@ Director="*res://director.gd"
 [display]
 
 window/stretch/mode="viewport"
+
+[dotnet]
+
+project/assembly_name="GrappleHooks"
+
+[filesystem]
+
+import/blender/enabled=false
 
 [input]
 

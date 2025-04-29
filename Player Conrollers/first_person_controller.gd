@@ -5,8 +5,6 @@ extends CharacterBody3D
 @onready var grapple_end: MeshInstance3D = $GrappleHook1/GrappleEnd
 @onready var line: Path3D = $GrappleHook1/Line
 
-@onready var grapple_end_2: RigidBody3D = $GrappleHook2/GrappleEnd
-@onready var line_2: Path3D = $GrappleHook2/Line
 
 enum STATE {GROUNDED, AIR, GRAPPLE}
 var cur_state = STATE.GROUNDED
@@ -22,13 +20,11 @@ var rope_amplitude = .5
 
 var tendons = {}
 func _ready() -> void:
-	for i in $GrappleHook2/Line.curve.point_count:
-		tendons[i] = Vector3.ZERO
-		
+
 	grapple_end.hide()
 	line.hide()
-	grapple_end_2.hide()
-	line_2.hide()
+
+
 	release_2()
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
@@ -111,7 +107,7 @@ var centri_force : Vector3
 @export var tension_physics = 5
 
 func hook_one_manager(delta):
-	tendon_puller(delta)
+
 #region click manager
 	if Input.is_action_just_pressed("left_click") and retracted == true:
 		connect_g()
@@ -119,9 +115,7 @@ func hook_one_manager(delta):
 	if Input.is_action_just_released("left_click") and retracted == false:
 		release()
 		
-	if Input.is_action_just_pressed('right_click') and retracted:
-		connect_g_2()
-	
+
 	if Input.is_action_just_released("right_click") and retracted == false:
 		release_2()
 #endregion
@@ -143,27 +137,13 @@ func hook_one_manager(delta):
 	
 	if retracted:
 		grapple_end.global_position = grapple_start.global_position
-		grapple_end_2.global_position = $GrappleHook2/GrappleStart.global_position
+
 		grapple_end.hide()
 		line.hide()
-		grapple_end_2.hide()
-		line_2.hide()
+
 #endregion
 	
-#region grapple 2
-	if hooked2:
-		if (grapple_end_2.global_position - global_position).length() > centripetal_range: #dot product magic
-			var angle_dif = grapple_end_2.global_position-global_position
-			centri_force = ((angle_dif).dot(velocity)/angle_dif.length_squared())*angle_dif
-			velocity += -centri_force
-	elif retracting_2 == false:
-		if $GrappleHook2/GrappleEnd/Area3D.has_overlapping_bodies():
-			rest_length = .1
-			hooked2 = true
-			grapple_end_2.freeze = true
-			centripetal_range = (grapple_end_2.global_position - global_position).length()
-			#print(grapple_end_2.freeze)
-#endregion
+
 		
 #endregion
 	
@@ -198,25 +178,13 @@ func release():
 	await tween.finished
 	retracted = true
 
-func connect_g_2():
-	grapple_end_2.show()
-	line_2.show()
-	retracted = false
-	grapple_end_2.freeze = false
-	grapple_end_2.apply_central_impulse(-$Camera3D.global_basis.z * 50)
-	rest_length = 1
-	
-	for i in line_2.curve.point_count:
-		randomize()
-		#tendons[i] += Vector3(randf_range(-.5,.5),randf_range(-.5,.5),0) * basis * rope_curve.sample(i/line_2.curve.point_count)
-	
 func release_2():
 	if hooked2: velocity.y += 4
-	grapple_end_2.freeze = true
+
 	hooked2 = false
 	retracting_2 = true
 	var tween = get_tree().create_tween()
-	tween.tween_property(grapple_end_2, "global_position", $GrappleHook2/GrappleStart.global_position, .2)
+
 	await tween.finished
 	retracting_2 = false
 	retracted = true
@@ -253,34 +221,3 @@ func manage_rope(delta):
 		if i != 0 and i != line.curve.point_count - 1:
 			
 			line.curve.set_point_position(i, line.to_local(line_position) + (Vector3(offset_noise * .1, offset_y, 0) * transform.basis))
-
-
-
-const damping_tendon = .96
-func tendon_puller(delta):
-	
-	
-	if !tendons: return
-	rest_length = abs(global_position - grapple_end_2.global_position).length() * .01
-	
-	for i : int in line_2.curve.point_count:
-		if i != 0 and i != line_2.curve.point_count - 1:
-			var distance = line_2.curve.get_point_position(i) - line_2.curve.get_point_position(i + 1)
-			if distance.length() > rest_length or distance.length() < squeeze_length:
-				for e in 1:
-					tendons[i + 1] += distance * delta * tension_physics
-					#var dist_mult = (distance - (Vector3(rest_length, rest_length,rest_length) * distance.normalized())) #somehow gives more weight to the end
-					tendons[i] -= (distance * delta * tension_physics)
-					#tendons[i] -= Vector3(0,.1,0) * delta
-					
-			tendons[i] *= damping_tendon
-		if i == 0 or i == line_2.curve.point_count - 1:
-			tendons[i] = Vector3.ZERO
-			
-			if i == 0: 
-				line_2.curve.set_point_position(i, line_2.to_local($GrappleHook2/GrappleStart.global_position))
-			if i == line_2.curve.point_count - 1:
-				line_2.curve.set_point_position(i,  line_2.to_local(grapple_end_2.global_position))
-		#if i.global_position != tendons[tendons.find(i) - 1].global_position: i.look_at(tendons[tendons.find(i) - 1].global_position)
-		line_2.curve.set_point_position(i, tendons[i] + line_2.curve.get_point_position(i))
-		
