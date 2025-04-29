@@ -27,6 +27,10 @@ window/stretch/mode="viewport"
 
 project/assembly_name="GrappleHooks"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/versatile-mobile-joystick/plugin.cfg")
+
 [filesystem]
 
 import/blender/enabled=false
